@@ -1,9 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as express from 'express';
+import { AuthenticationMiddleware } from './authentication/authentication.middleware';
+
 
 export async function bootstrap(port) {
   const app = await NestFactory.create(AppModule);
+  app.use(express.json());
+ // app.use(AuthenticationMiddleware);
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -22,4 +27,4 @@ export async function bootstrap(port) {
 
   await app.listen(port);
 }
-bootstrap(3001);
+//bootstrap(3001);

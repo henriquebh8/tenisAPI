@@ -1,14 +1,20 @@
-import { Body, Controller, Get, Post, Req, Query, Param, Delete, Put, UsePipes, ValidationPipe, HttpException, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Query, Param, Delete, Put, UsePipes, ValidationPipe, HttpException, HttpStatus, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import {CreatePlayerDto} from '../dto/createPlayer.dto'
 import {PlayersService} from './players.service'
 import {Player, UserRanking, CustomDeleteResult } from '../interface/player.interface';
 import { PlayerValidatePipe, PlayerValidatePipeGet } from '../pipes/players-validate.pipe';
+import { AuthenticationRepository } from '../authentication/autentication.repository';
+import { AllowAny } from '../decorators/allow-any.decorator';
+
 
 @ApiTags('players')
 @Controller('players')
 export class PlayersController {
-    constructor(private readonly playersService: PlayersService) {}
+    constructor(
+        private readonly playersService: PlayersService,
+        private readonly authenticationRepository: AuthenticationRepository
+        ) {}
 
     @ApiOperation({ summary: 'Get all players' })
     @Get()
@@ -71,6 +77,16 @@ export class PlayersController {
     async deletePlayer(@Param('id', PlayerValidatePipe) id: string): Promise<CustomDeleteResult> {
         try{
             return await this.playersService.deletePlayer(id)
+        }catch(error){
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @AllowAny()
+    @Post('login')
+    async login(@Request() req: any) {
+        try{
+        return this.authenticationRepository.getAuthentication(req.body);
         }catch(error){
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
