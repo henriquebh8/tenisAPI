@@ -1,0 +1,3 @@
+#!/bin/sh
+chmod +x ./dist/src/bin/www.js
+./dist/src/bin/www.js
